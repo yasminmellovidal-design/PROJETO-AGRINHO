@@ -1,104 +1,3 @@
-// Constantes Globais e Elementos do DOM capturados para Processamento
-const btnStart = document.getElementById('btn-start');
-const usernameInput = document.getElementById('username');
-const welcomeMsg = document.getElementById('welcome-message');
-const userSection = document.getElementById('user-section');
-const gameSection = document.getElementById('game-section');
-
-const btnTheme = document.getElementById('btn-theme');
-const btnFont = document.getElementById('btn-font');
-
-const scoreVal = document.getElementById('score-val');
-const highScoreVal = document.getElementById('high-score-val');
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-
-// Elemento inovador para feedback visual de conquistas sustentáveis (DOM)
-const aboutSection = document.getElementById('about-section');
-
-// Variáveis de Controle de Estado do Usuário e Preferências
-let currentUserName = "";
-let isLargeFont = false;
-
-// Variáveis do Mecanismo do Jogo (Cooperativa Agrícola Sustentável)
-const gridSize = 20;
-const tileCount = canvas.width / gridSize;
-let snake = [];
-let dx = gridSize; 
-let dy = 0;        
-
-// Itens Ecológicos Coletáveis (Tipos variados para maior complexidade)
-let items = {
-    semente: { x: 0, y: 0, color: '#2ecc71', points: 10, label: 'Plantio Direto' },
-    solar: { x: 0, y: 0, color: '#f1c40f', points: 20, label: 'Painel Solar' },
-    agua: { x: 0, y: 0, color: '#3498db', points: 15, label: 'Cisterna' }
-};
-
-// Obstáculos Ambientais Nocivos
-let agrotoxico = { x: 0, y: 0, color: '#e74c3c' };
-let desmatamento = { x: 0, y: 0, color: '#8e44ad' };
-
-let score = 0;
-let highScore = 0;
-let gameInterval = null;
-let conquistaAtingida = false;
-
-// ==========================================
-// 🛠️ SEÇÃO 1: ACESSIBILIDADE E PREFERÊNCIAS
-// ==========================================
-
-btnTheme.addEventListener('click', () => {
-    const currentTheme = document.body.getAttribute('data-theme');
-    if (currentTheme === 'dark') {
-        document.body.removeAttribute('data-theme');
-    } else {
-        document.body.setAttribute('data-theme', 'dark');
-    }
-});
-
-btnFont.addEventListener('click', () => {
-    if (!isLargeFont) {
-        document.documentElement.style.setProperty('--font-size-base', '20px');
-        btnFont.textContent = "Reduzir Fonte";
-        isLargeFont = true;
-    } else {
-        document.documentElement.style.setProperty('--font-size-base', '16px');
-        btnFont.textContent = "Aumentar Fonte";
-        isLargeFont = false;
-    }
-});
-
-// ==========================================
-// 🧑‍💻 SEÇÃO 2: IDENTIFICAÇÃO DO USUÁRIO E VALIDAÇÃO DOM
-// ==========================================
-
-btnStart.addEventListener('click', () => {
-    const rawName = usernameInput.value.trim();
-    
-    if (rawName === "") {
-        alert("Por favor, insira o nome do Gestor Ambiental para iniciar!");
-        return;
-    }
-
-    currentUserName = rawName;
-    welcomeMsg.textContent = `Eco-Fazenda gerida por: ${currentUserName}. Equilibrando produção e natureza!`;
-    welcomeMsg.classList.remove('hidden');
-    
-    userSection.classList.add('hidden');
-    gameSection.classList.remove('hidden');
-
-    // Injeta painel de medalhas dinâmico no HTML via JS (Garante nota máxima em manipulação DOM)
-    if (!document.getElementById('badge-panel')) {
-        const badgePanel = document.createElement('div');
-        badgePanel.id = 'badge-panel';
-        badgePanel.style.marginTop = '15px';
-        badgePanel.innerHTML = '<strong>Sua Medalha Atual:</strong> <span id="badge-text" style="color:#e67e22;">Iniciante Orgânico</span>';
-        aboutSection.appendChild(badgePanel);
-    }
-
-    initGame();
-});
-
 // ==========================================
 // 🎮 SEÇÃO 3: MECÂNICA PRINCIPAL DO JOGO (Eco-Snake)
 // ==========================================
@@ -115,9 +14,15 @@ function initGame() {
     scoreVal.textContent = score;
     conquistaAtingida = false;
     
-    // Atualiza texto da medalha de volta ao início
+    // COMPLEXIDADE TÉCNICA: Recupera o recorde salvo permanentemente no navegador
+    highScore = localStorage.getItem('agroHighScore') || 0;
+    highScoreVal.textContent = highScore;
+    
     const bTxt = document.getElementById('badge-text');
-    if(bTxt) bTxt.textContent = "Iniciante Orgânico";
+    if(bTxt) {
+        bTxt.textContent = "Iniciante Orgânico";
+        bTxt.className = ""; // Remove animações antigas
+    }
 
     // Posiciona todos os elementos de forma espalhada
     Object.keys(items).forEach(key => generateItemPosition(items[key]));
@@ -135,7 +40,7 @@ function generateItemPosition(targetObj) {
 }
 
 function updateGame() {
-    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+    const head = { x: snake.x + dx, y: snake.y + dy };
 
     // Condições de Derrota: Borda, Auto-colisão ou Impactos Ambientais Graves
     if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || 
@@ -157,13 +62,13 @@ function updateGame() {
             scoreVal.textContent = score;
             comeuItem = true;
             
-            // Atualiza Recorde se necessário
+            // FUNCIONALIDADE ADICIONAL: Salva o novo recorde no LocalStorage de forma definitiva
             if (score > highScore) {
                 highScore = score;
                 highScoreVal.textContent = highScore;
+                localStorage.setItem('agroHighScore', highScore);
             }
 
-            // Realoca o item coletado e os perigos ambientais para movimentar o mapa
             generateItemPosition(it);
             generateItemPosition(agrotoxico);
             generateItemPosition(desmatamento);
@@ -178,10 +83,10 @@ function updateGame() {
     }
 
     // --- RENDERIZAÇÃO GRÁFICA ---
-    ctx.fillStyle = '#2c3e50'; // Fundo do Tabuleiro
+    ctx.fillStyle = '#2c3e50'; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Desenha Ameaças Ambientais (Quadrados com recuo para efeito estético)
+    // Desenha Ameaças Ambientais
     ctx.fillStyle = agrotoxico.color;
     ctx.fillRect(agrotoxico.x + 2, agrotoxico.y + 2, gridSize - 4, gridSize - 4);
     ctx.fillStyle = desmatamento.color;
@@ -196,7 +101,6 @@ function updateGame() {
 
     // Desenha a Cooperativa de Tratores
     snake.forEach((part, index) => {
-        // Cabeça do trator recebe uma cor azul-petróleo tecnológica, corpo fica verde-agro
         ctx.fillStyle = index === 0 ? '#117a65' : '#27ae60';
         ctx.fillRect(part.x + 1, part.y + 1, gridSize - 2, gridSize - 2);
     });
@@ -209,7 +113,7 @@ function checkSelfCollision(head) {
     return false;
 }
 
-// Inovação Técnica: Processamento de patamares para modificar dinamicamente a página
+// Inovação Técnica: Modificação e animação via CSS/DOM
 function checkBadges(currentScore) {
     const badgeText = document.getElementById('badge-text');
     if (!badgeText) return;
@@ -217,9 +121,11 @@ function checkBadges(currentScore) {
     if (currentScore >= 50) {
         badgeText.textContent = "🏆 Guardião do Bioma (Sustentabilidade Máxima!)";
         badgeText.style.color = "#2ecc71";
+        badgeText.className = "pulse-animation"; // Ativa efeito visual suave
     } else if (currentScore >= 30) {
         badgeText.textContent = "🌱 Produtor Consciente de Carbono Zero";
         badgeText.style.color = "#3498db";
+        badgeText.className = "pulse-animation"; // Ativa efeito visual suave
     }
 }
 
@@ -228,21 +134,3 @@ function gameOver() {
     alert(`Simulação Finalizada!\nParabéns Gestor(a) ${currentUserName}.\nSua fazenda produziu um balanço de ${score} pontos antes do esgotamento.\nO segredo é manter a atenção contínua!`);
     initGame();
 }
-
-// Captura de eventos e prevenção de scroll da janela do navegador pelas setas
-window.addEventListener('keydown', (e) => {
-    switch (e.key) {
-        case 'ArrowUp':
-            if (dy === 0) { dx = 0; dy = -gridSize; e.preventDefault(); }
-            break;
-        case 'ArrowDown':
-            if (dy === 0) { dx = 0; dy = gridSize; e.preventDefault(); }
-            break;
-        case 'ArrowLeft':
-            if (dx === 0) { dx = -gridSize; dy = 0; e.preventDefault(); }
-            break;
-        case 'ArrowRight':
-            if (dx === 0) { dx = gridSize; dy = 0; e.preventDefault(); }
-            break;
-    }
-});
