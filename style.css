@@ -1,0 +1,215 @@
+/* Variáveis de Cores para Modo Claro e Escuro */
+:root {
+    --bg-primary: #f4f7f5;
+    --bg-card: #ffffff;
+    --text-main: #2e4a3f;
+    --text-muted: #556b62;
+    --accent-color: #27ae60;
+    --accent-hover: #1e8449;
+    --danger-color: #e74c3c;
+    --border-color: #d1ebd9;
+    --font-size-base: 16px;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #121814;
+    --bg-card: #1a241f;
+    --text-main: #e2f0e9;
+    --text-muted: #a3bfb2;
+    --accent-color: #2ecc71;
+    --accent-hover: #27ae60;
+    --border-color: #2c3e35;
+}
+
+/* Configurações Gerais Base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: var(--font-size-base);
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Cabeçalho Semântico */
+header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, var(--accent-color), #117a65);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+/* Layout Responsivo Base */
+main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.card h2 {
+    color: var(--accent-color);
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+/* Formulários e Elementos de Interação */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="text"] {
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    font-size: 1rem;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+button {
+    padding: 12px 24px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 2px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+.controls-section {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+/* Elementos do Jogo Canvas */
+.score-board {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    background-color: var(--bg-primary);
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+canvas {
+    background-color: #2c3e50;
+    border: 4px solid var(--accent-color);
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Legendas Didáticas */
+.game-legend ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.game-legend li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.dot.positive { background-color: var(--accent-color); }
+.dot.negative { background-color: var(--danger-color); }
+
+/* Rodapé */
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Classes de Utilidade */
+.hidden { display: none !important; }
+
+#welcome-message {
+    font-weight: bold;
+    color: var(--accent-color);
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* 📱 Media Queries (Responsividade Obrigatória para Nível 4) */
+@media (max-width: 600px) {
+    body { padding: 10px; }
+    header h1 { font-size: 1.6rem; }
+    .controls-section { flex-direction: column; }
+    button { width: 100%; }
+}
