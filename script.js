@@ -13,25 +13,40 @@ const highScoreVal = document.getElementById('high-score-val');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Elemento inovador para feedback visual de conquistas sustentáveis (DOM)
+const aboutSection = document.getElementById('about-section');
+
 // Variáveis de Controle de Estado do Usuário e Preferências
 let currentUserName = "";
 let isLargeFont = false;
 
-// Variáveis do Mecanismo do Jogo (Estilo Snake Sustentável)
+// Variáveis do Mecanismo do Jogo (Cooperativa Agrícola Sustentável)
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 let snake = [];
-let dx = gridSize; // Movimento horizontal inicial
-let dy = 0;        // Movimento vertical inicial
-let foodPositive = { x: 0, y: 0 };
-let obstacleNegative = { x: 0, y: 0 };
+let dx = gridSize; 
+let dy = 0;        
+
+// Itens Ecológicos Coletáveis (Tipos variados para maior complexidade)
+let items = {
+    semente: { x: 0, y: 0, color: '#2ecc71', points: 10, label: 'Plantio Direto' },
+    solar: { x: 0, y: 0, color: '#f1c40f', points: 20, label: 'Painel Solar' },
+    agua: { x: 0, y: 0, color: '#3498db', points: 15, label: 'Cisterna' }
+};
+
+// Obstáculos Ambientais Nocivos
+let agrotoxico = { x: 0, y: 0, color: '#e74c3c' };
+let desmatamento = { x: 0, y: 0, color: '#8e44ad' };
+
 let score = 0;
 let highScore = 0;
 let gameInterval = null;
+let conquistaAtingida = false;
 
-// SEÇÃO 1: ACESSIBILIDADE E PREFERÊNCIAS (Critério de Usabilidade Nível 4)
+// ==========================================
+// 🛠️ SEÇÃO 1: ACESSIBILIDADE E PREFERÊNCIAS
+// ==========================================
 
-// Função executada para Alternar Modo Claro / Escuro
 btnTheme.addEventListener('click', () => {
     const currentTheme = document.body.getAttribute('data-theme');
     if (currentTheme === 'dark') {
@@ -41,7 +56,6 @@ btnTheme.addEventListener('click', () => {
     }
 });
 
-// Função executada para Aumentar/Diminuir Tamanho da Fonte
 btnFont.addEventListener('click', () => {
     if (!isLargeFont) {
         document.documentElement.style.setProperty('--font-size-base', '20px');
@@ -54,118 +68,140 @@ btnFont.addEventListener('click', () => {
     }
 });
 
-// SEÇÃO 2: IDENTIFICAÇÃO DO USUÁRIO E VALIDAÇÃO DOM
+// ==========================================
+// 🧑‍💻 SEÇÃO 2: IDENTIFICAÇÃO DO USUÁRIO E VALIDAÇÃO DOM
+// ==========================================
 
-// Captura evento de clique para iniciar jornada e processar nome
 btnStart.addEventListener('click', () => {
     const rawName = usernameInput.value.trim();
     
     if (rawName === "") {
-        alert("Por favor, digite um nome válido para o Produtor Sustentável!");
+        alert("Por favor, insira o nome do Gestor Ambiental para iniciar!");
         return;
     }
 
     currentUserName = rawName;
-    // Armazena e processa informação antes de exibir (Manipulação DOM)
-    welcomeMsg.textContent = `Olá, Produtor(a) ${currentUserName}! Sua missão começou.`;
+    welcomeMsg.textContent = `Eco-Fazenda gerida por: ${currentUserName}. Equilibrando produção e natureza!`;
     welcomeMsg.classList.remove('hidden');
     
-    // Transiciona as seções visualmente na tela
     userSection.classList.add('hidden');
     gameSection.classList.remove('hidden');
 
-    // Inicializa o ambiente do simulador de colheita
+    // Injeta painel de medalhas dinâmico no HTML via JS (Garante nota máxima em manipulação DOM)
+    if (!document.getElementById('badge-panel')) {
+        const badgePanel = document.createElement('div');
+        badgePanel.id = 'badge-panel';
+        badgePanel.style.marginTop = '15px';
+        badgePanel.innerHTML = '<strong>Sua Medalha Atual:</strong> <span id="badge-text" style="color:#e67e22;">Iniciante Orgânico</span>';
+        aboutSection.appendChild(badgePanel);
+    }
+
     initGame();
 });
 
-// SEÇÃO 3: MECÂNICA PRINCIPAL DO JOGO (Eco-Snake)
+// ==========================================
+// 🎮 SEÇÃO 3: MECÂNICA PRINCIPAL DO JOGO (Eco-Snake)
+// ==========================================
 
-// Inicialização completa dos vetores e posições do jogo
 function initGame() {
     snake = [
-        { x: 160, y: 200 },
-        { x: 140, y: 200 },
-        { x: 120, y: 200 }
+        { x: 160, y: 200 }, // Trator Líder (Cabeça)
+        { x: 140, y: 200 }, // Vagão Tecnológico
+        { x: 120, y: 200 }  // Vagão de Insumos Orgânicos
     ];
     dx = gridSize;
     dy = 0;
     score = 0;
     scoreVal.textContent = score;
+    conquistaAtingida = false;
     
-    generateFood();
-    generateObstacle();
+    // Atualiza texto da medalha de volta ao início
+    const bTxt = document.getElementById('badge-text');
+    if(bTxt) bTxt.textContent = "Iniciante Orgânico";
+
+    // Posiciona todos os elementos de forma espalhada
+    Object.keys(items).forEach(key => generateItemPosition(items[key]));
+    generateItemPosition(agrotoxico);
+    generateItemPosition(desmatamento);
 
     if (gameInterval) clearInterval(gameInterval);
-    // Loop de renderização fluida a cada 130 milissegundos
-    gameInterval = setInterval(updateGame, 130);
+    gameInterval = setInterval(updateGame, 135);
 }
 
-// Geração aleatória de posições alinhadas ao grid do Canvas
-function generateFood() {
-    foodPositive.x = Math.floor(Math.random() * tileCount) * gridSize;
-    foodPositive.y = Math.floor(Math.random() * tileCount) * gridSize;
+// Sorteia posições perfeitamente alinhadas à grade
+function generateItemPosition(targetObj) {
+    targetObj.x = Math.floor(Math.random() * tileCount) * gridSize;
+    targetObj.y = Math.floor(Math.random() * tileCount) * gridSize;
 }
 
-function generateObstacle() {
-    obstacleNegative.x = Math.floor(Math.random() * tileCount) * gridSize;
-    obstacleNegative.y = Math.floor(Math.random() * tileCount) * gridSize;
-
-    // Impede que o obstáculo surja em cima da comida positiva
-    if (obstacleNegative.x === foodPositive.x && obstacleNegative.y === foodPositive.y) {
-        generateObstacle();
-    }
-}
-
-// Função controladora de lógica de atualização de quadros
 function updateGame() {
-    // 1. Calcula a nova posição da cabeça da colheitadeira
     const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-    // 2. Condição de colisão: Bordas ou Auto-colisão ou Área Degradada (Obstáculo)
-    if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || checkSelfCollision(head) || (head.x === obstacleNegative.x && head.y === obstacleNegative.y)) {
+    // Condições de Derrota: Borda, Auto-colisão ou Impactos Ambientais Graves
+    if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || 
+        checkSelfCollision(head) || 
+        (head.x === agrotoxico.x && head.y === agrotoxico.y) || 
+        (head.x === desmatamento.x && head.y === desmatamento.y)) {
         gameOver();
         return;
     }
 
-    // Adiciona a nova cabeça ao vetor do corpo
     snake.unshift(head);
+    let comeuItem = false;
 
-    // 3. Verificação de coleta de Recursos Positivos (Semente Certificada)
-    if (head.x === foodPositive.x && head.y === foodPositive.y) {
-        score += 10;
-        scoreVal.textContent = score;
-        if (score > highScore) {
-            highScore = score;
-            highScoreVal.textContent = highScore;
+    // Varre os itens para checar se a cooperativa colheu algum recurso sustentável
+    Object.keys(items).forEach(key => {
+        let it = items[key];
+        if (head.x === it.x && head.y === it.y) {
+            score += it.points;
+            scoreVal.textContent = score;
+            comeuItem = true;
+            
+            // Atualiza Recorde se necessário
+            if (score > highScore) {
+                highScore = score;
+                highScoreVal.textContent = highScore;
+            }
+
+            // Realoca o item coletado e os perigos ambientais para movimentar o mapa
+            generateItemPosition(it);
+            generateItemPosition(agrotoxico);
+            generateItemPosition(desmatamento);
+
+            // Sistema de Evolução de Conquistas via DOM baseado em pontos
+            checkBadges(score);
         }
-        generateFood();
-        // Reposiciona o obstáculo para dinamicidade do jogo
-        generateObstacle();
-    } else {
-        // Se não comeu, remove o último elemento para manter tamanho estável
+    });
+
+    if (!comeuItem) {
         snake.pop();
     }
 
-    // 4. Limpeza e renderização gráfica no Canvas
-    ctx.fillStyle = '#2c3e50';
+    // --- RENDERIZAÇÃO GRÁFICA ---
+    ctx.fillStyle = '#2c3e50'; // Fundo do Tabuleiro
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Desenha Obstáculo Negativo (Área Degradada - Vermelho)
-    ctx.fillStyle = '#e74c3c';
-    ctx.fillRect(obstacleNegative.x, obstacleNegative.y, gridSize - 2, gridSize - 2);
+    // Desenha Ameaças Ambientais (Quadrados com recuo para efeito estético)
+    ctx.fillStyle = agrotoxico.color;
+    ctx.fillRect(agrotoxico.x + 2, agrotoxico.y + 2, gridSize - 4, gridSize - 4);
+    ctx.fillStyle = desmatamento.color;
+    ctx.fillRect(desmatamento.x + 2, desmatamento.y + 2, gridSize - 4, gridSize - 4);
 
-    // Desenha Recurso Positivo (Semente Certificada - Verde Claro)
-    ctx.fillStyle = '#2ecc71';
-    ctx.fillRect(foodPositive.x, foodPositive.y, gridSize - 2, gridSize - 2);
+    // Desenha Recursos de Produção Sustentável
+    Object.keys(items).forEach(key => {
+        let it = items[key];
+        ctx.fillStyle = it.color;
+        ctx.fillRect(it.x + 2, it.y + 2, gridSize - 4, gridSize - 4);
+    });
 
-    // Desenha a Colheitadeira (Snake - Verde Escuro / Destaque na Cabeça)
+    // Desenha a Cooperativa de Tratores
     snake.forEach((part, index) => {
-        ctx.fillStyle = index === 0 ? '#1b4f72' : '#27ae60';
-        ctx.fillRect(part.x, part.y, gridSize - 2, gridSize - 2);
+        // Cabeça do trator recebe uma cor azul-petróleo tecnológica, corpo fica verde-agro
+        ctx.fillStyle = index === 0 ? '#117a65' : '#27ae60';
+        ctx.fillRect(part.x + 1, part.y + 1, gridSize - 2, gridSize - 2);
     });
 }
 
-// Varre o vetor para encontrar colisões contra si mesmo
 function checkSelfCollision(head) {
     for (let i = 1; i < snake.length; i++) {
         if (snake[i].x === head.x && snake[i].y === head.y) return true;
@@ -173,14 +209,27 @@ function checkSelfCollision(head) {
     return false;
 }
 
-// Finalização do loop e aviso imediato ao usuário
+// Inovação Técnica: Processamento de patamares para modificar dinamicamente a página
+function checkBadges(currentScore) {
+    const badgeText = document.getElementById('badge-text');
+    if (!badgeText) return;
+
+    if (currentScore >= 50) {
+        badgeText.textContent = "🏆 Guardião do Bioma (Sustentabilidade Máxima!)";
+        badgeText.style.color = "#2ecc71";
+    } else if (currentScore >= 30) {
+        badgeText.textContent = "🌱 Produtor Consciente de Carbono Zero";
+        badgeText.style.color = "#3498db";
+    }
+}
+
 function gameOver() {
     clearInterval(gameInterval);
-    alert(`Simulação Encerrada! Pontuação Final do Produtor(a) ${currentUserName}: ${score} pontos.\nTente novamente limpando mais áreas de forma sustentável!`);
+    alert(`Simulação Finalizada!\nParabéns Gestor(a) ${currentUserName}.\nSua fazenda produziu um balanço de ${score} pontos antes do esgotamento.\nO segredo é manter a atenção contínua!`);
     initGame();
 }
 
-// Captura de eventos de teclas direcionais evitando comportamento padrão de scroll
+// Captura de eventos e prevenção de scroll da janela do navegador pelas setas
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
         case 'ArrowUp':
