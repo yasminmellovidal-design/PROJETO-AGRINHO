@@ -22,7 +22,7 @@
             <h2>Bem-vindo ao Desafio Sustentável</h2>
             <p>Insira seu nome para iniciar a simulação da colheita ecológica.</p>
             <div class="form-group">
-                <label for="username">Nome do Produtor:</label>
+                <label for="username">Nome do Produtor / Gestor:</label>
                 <input type="text" id="username" placeholder="Ex: João Silva" aria-label="Nome do Produtor">
                 <button id="btn-start">Iniciar Jornada</button>
             </div>
@@ -35,10 +35,10 @@
             <button id="btn-font" class="btn-secondary">Aumentar Fonte</button>
         </section>
 
-        <!-- Seção do Jogo Interativo (Eco-Snake) -->
+        <!-- Seção do Jogo Interativo (Cooperativa Agrícola) -->
         <section id="game-section" class="card hidden">
             <h2>Simulador: Colheita Ecológica</h2>
-            <p>Use as <strong>setas do teclado</strong> para guiar a colheitadeira. Colete itens sustentáveis e evite ações poluentes!</p>
+            <p>Use as <strong>setas do teclado</strong> para guiar a cooperativa de tratores elétricos. Colete recursos e evite impactos ambientais!</p>
             
             <!-- Painel de Pontuação com Manipulação do DOM -->
             <div class="score-board">
@@ -51,12 +51,15 @@
                 <canvas id="gameCanvas" width="400" height="400"></canvas>
             </div>
 
-            <!-- Legenda Didática do Jogo -->
+            <!-- Legenda Dinâmica do Jogo -->
             <div class="game-legend">
-                <h3>Legenda de Recursos:</h3>
+                <h3>Legenda do Ecossistema:</h3>
                 <ul>
-                    <li><span class="dot positive"></span> <strong>Semente Certificada (+10 pts):</strong> Produção eficiente.</li>
-                    <li><span class="dot negative"></span> <strong>Área de Degradação (Game Over):</strong> Evite o esgotamento do solo!</li>
+                    <li><span class="dot" style="background-color: #2ecc71;"></span> <strong>Plantio Direto (+10 pts):</strong> Manejo correto e proteção do solo.</li>
+                    <li><span class="dot" style="background-color: #f1c40f;"></span> <strong>Painel Solar (+20 pts):</strong> Transição para energia limpa na fazenda.</li>
+                    <li><span class="dot" style="background-color: #3498db;"></span> <strong>Cisterna de Água (+15 pts):</strong> Captação sustentável de água da chuva.</li>
+                    <li><span class="dot" style="background-color: #e74c3c;"></span> <strong>Defensivo Químico (Game Over):</strong> Contaminação química de mananciais.</li>
+                    <li><span class="dot" style="background-color: #8e44ad;"></span> <strong>Desmatamento (Game Over):</strong> Degradação e destruição da biodiversidade.</li>
                 </ul>
             </div>
         </section>
