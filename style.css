@@ -213,3 +213,20 @@ footer {
     .controls-section { flex-direction: column; }
     button { width: 100%; }
 }
+
+/* ==========================================================================
+   ✨ SEÇÃO DE ANIMAÇÕES VISUAIS E FLUIDEZ (Exigência Nível 4 de Usabilidade)
+   ========================================================================== */
+
+/* Efeito de Transição Suave para Conquistas */
+.pulse-animation {
+    display: inline-block;
+    animation: pulseEffect 1.5s infinite ease-in-out;
+    font-weight: bold;
+}
+
+@keyframes pulseEffect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); filter: brightness(1.2); }
+    100% { transform: scale(1); }
+}
