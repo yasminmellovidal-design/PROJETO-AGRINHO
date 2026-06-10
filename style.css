@@ -230,3 +230,59 @@ footer {
     50% { transform: scale(1.08); filter: brightness(1.2); }
     100% { transform: scale(1); }
 }
+
+/* ==========================================================================
+   📰 SEÇÃO DE ARTIGOS E MÍDIAS RESPONSIVAS (Inovação de Conteúdo)
+   ========================================================================== */
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Imagem responsiva: nunca quebra a tela e se adapta perfeitamente */
+.responsive-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.intro-text {
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+/* Cria o layout em 3 colunas paralelas */
+.articles-grid {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.article-item {
+    flex: 1;
+    background-color: var(--bg-primary);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+}
+
+.article-item h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.article-item p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+/* Ajuste de responsividade para telas pequenas (Celulares) */
+@media (max-width: 600px) {
+    .articles-grid {
+        flex-direction: column; /* Transforma as colunas em blocos verticais no celular */
+    }
+}
