@@ -1,215 +1,199 @@
-/* Variáveis de Cores para Modo Claro e Escuro */
-:root {
-    --bg-primary: #f4f7f5;
-    --bg-card: #ffffff;
-    --text-main: #2e4a3f;
-    --text-muted: #556b62;
-    --accent-color: #27ae60;
-    --accent-hover: #1e8449;
-    --danger-color: #e74c3c;
-    --border-color: #d1ebd9;
-    --font-size-base: 16px;
+// Constantes Globais e Elementos do DOM capturados para Processamento
+const btnStart = document.getElementById('btn-start');
+const usernameInput = document.getElementById('username');
+const welcomeMsg = document.getElementById('welcome-message');
+const userSection = document.getElementById('user-section');
+const gameSection = document.getElementById('game-section');
+
+const btnTheme = document.getElementById('btn-theme');
+const btnFont = document.getElementById('btn-font');
+
+const scoreVal = document.getElementById('score-val');
+const highScoreVal = document.getElementById('high-score-val');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Variáveis de Controle de Estado do Usuário e Preferências
+let currentUserName = "";
+let isLargeFont = false;
+
+// Variáveis do Mecanismo do Jogo (Estilo Snake Sustentável)
+const gridSize = 20;
+const tileCount = canvas.width / gridSize;
+let snake = [];
+let dx = gridSize; // Movimento horizontal inicial
+let dy = 0;        // Movimento vertical inicial
+let foodPositive = { x: 0, y: 0 };
+let obstacleNegative = { x: 0, y: 0 };
+let score = 0;
+let highScore = 0;
+let gameInterval = null;
+
+// SEÇÃO 1: ACESSIBILIDADE E PREFERÊNCIAS (Critério de Usabilidade Nível 4)
+
+// Função executada para Alternar Modo Claro / Escuro
+btnTheme.addEventListener('click', () => {
+    const currentTheme = document.body.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+        document.body.removeAttribute('data-theme');
+    } else {
+        document.body.setAttribute('data-theme', 'dark');
+    }
+});
+
+// Função executada para Aumentar/Diminuir Tamanho da Fonte
+btnFont.addEventListener('click', () => {
+    if (!isLargeFont) {
+        document.documentElement.style.setProperty('--font-size-base', '20px');
+        btnFont.textContent = "Reduzir Fonte";
+        isLargeFont = true;
+    } else {
+        document.documentElement.style.setProperty('--font-size-base', '16px');
+        btnFont.textContent = "Aumentar Fonte";
+        isLargeFont = false;
+    }
+});
+
+// SEÇÃO 2: IDENTIFICAÇÃO DO USUÁRIO E VALIDAÇÃO DOM
+
+// Captura evento de clique para iniciar jornada e processar nome
+btnStart.addEventListener('click', () => {
+    const rawName = usernameInput.value.trim();
+    
+    if (rawName === "") {
+        alert("Por favor, digite um nome válido para o Produtor Sustentável!");
+        return;
+    }
+
+    currentUserName = rawName;
+    // Armazena e processa informação antes de exibir (Manipulação DOM)
+    welcomeMsg.textContent = `Olá, Produtor(a) ${currentUserName}! Sua missão começou.`;
+    welcomeMsg.classList.remove('hidden');
+    
+    // Transiciona as seções visualmente na tela
+    userSection.classList.add('hidden');
+    gameSection.classList.remove('hidden');
+
+    // Inicializa o ambiente do simulador de colheita
+    initGame();
+});
+
+// SEÇÃO 3: MECÂNICA PRINCIPAL DO JOGO (Eco-Snake)
+
+// Inicialização completa dos vetores e posições do jogo
+function initGame() {
+    snake = [
+        { x: 160, y: 200 },
+        { x: 140, y: 200 },
+        { x: 120, y: 200 }
+    ];
+    dx = gridSize;
+    dy = 0;
+    score = 0;
+    scoreVal.textContent = score;
+    
+    generateFood();
+    generateObstacle();
+
+    if (gameInterval) clearInterval(gameInterval);
+    // Loop de renderização fluida a cada 130 milissegundos
+    gameInterval = setInterval(updateGame, 130);
 }
 
-[data-theme="dark"] {
-    --bg-primary: #121814;
-    --bg-card: #1a241f;
-    --text-main: #e2f0e9;
-    --text-muted: #a3bfb2;
-    --accent-color: #2ecc71;
-    --accent-hover: #27ae60;
-    --border-color: #2c3e35;
+// Geração aleatória de posições alinhadas ao grid do Canvas
+function generateFood() {
+    foodPositive.x = Math.floor(Math.random() * tileCount) * gridSize;
+    foodPositive.y = Math.floor(Math.random() * tileCount) * gridSize;
 }
 
-/* Configurações Gerais Base */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
+function generateObstacle() {
+    obstacleNegative.x = Math.floor(Math.random() * tileCount) * gridSize;
+    obstacleNegative.y = Math.floor(Math.random() * tileCount) * gridSize;
+
+    // Impede que o obstáculo surja em cima da comida positiva
+    if (obstacleNegative.x === foodPositive.x && obstacleNegative.y === foodPositive.y) {
+        generateObstacle();
+    }
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: var(--font-size-base);
-    background-color: var(--bg-primary);
-    color: var(--text-main);
-    line-height: 1.6;
-    padding: 20px;
+// Função controladora de lógica de atualização de quadros
+function updateGame() {
+    // 1. Calcula a nova posição da cabeça da colheitadeira
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+    // 2. Condição de colisão: Bordas ou Auto-colisão ou Área Degradada (Obstáculo)
+    if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || checkSelfCollision(head) || (head.x === obstacleNegative.x && head.y === obstacleNegative.y)) {
+        gameOver();
+        return;
+    }
+
+    // Adiciona a nova cabeça ao vetor do corpo
+    snake.unshift(head);
+
+    // 3. Verificação de coleta de Recursos Positivos (Semente Certificada)
+    if (head.x === foodPositive.x && head.y === foodPositive.y) {
+        score += 10;
+        scoreVal.textContent = score;
+        if (score > highScore) {
+            highScore = score;
+            highScoreVal.textContent = highScore;
+        }
+        generateFood();
+        // Reposiciona o obstáculo para dinamicidade do jogo
+        generateObstacle();
+    } else {
+        // Se não comeu, remove o último elemento para manter tamanho estável
+        snake.pop();
+    }
+
+    // 4. Limpeza e renderização gráfica no Canvas
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Desenha Obstáculo Negativo (Área Degradada - Vermelho)
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(obstacleNegative.x, obstacleNegative.y, gridSize - 2, gridSize - 2);
+
+    // Desenha Recurso Positivo (Semente Certificada - Verde Claro)
+    ctx.fillStyle = '#2ecc71';
+    ctx.fillRect(foodPositive.x, foodPositive.y, gridSize - 2, gridSize - 2);
+
+    // Desenha a Colheitadeira (Snake - Verde Escuro / Destaque na Cabeça)
+    snake.forEach((part, index) => {
+        ctx.fillStyle = index === 0 ? '#1b4f72' : '#27ae60';
+        ctx.fillRect(part.x, part.y, gridSize - 2, gridSize - 2);
+    });
 }
 
-/* Cabeçalho Semântico */
-header {
-    text-align: center;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, var(--accent-color), #117a65);
-    color: white;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+// Varre o vetor para encontrar colisões contra si mesmo
+function checkSelfCollision(head) {
+    for (let i = 1; i < snake.length; i++) {
+        if (snake[i].x === head.x && snake[i].y === head.y) return true;
+    }
+    return false;
 }
 
-header h1 {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
+// Finalização do loop e aviso imediato ao usuário
+function gameOver() {
+    clearInterval(gameInterval);
+    alert(`Simulação Encerrada! Pontuação Final do Produtor(a) ${currentUserName}: ${score} pontos.\nTente novamente limpando mais áreas de forma sustentável!`);
+    initGame();
 }
 
-/* Layout Responsivo Base */
-main {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.card h2 {
-    color: var(--accent-color);
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 8px;
-}
-
-/* Formulários e Elementos de Interação */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 0;
-}
-
-label {
-    font-weight: bold;
-}
-
-input[type="text"] {
-    padding: 12px;
-    border: 2px solid var(--border-color);
-    border-radius: 6px;
-    background-color: var(--bg-card);
-    color: var(--text-main);
-    font-size: 1rem;
-}
-
-input[type="text"]:focus {
-    outline: none;
-    border-color: var(--accent-color);
-}
-
-button {
-    padding: 12px 24px;
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-button:hover {
-    background-color: var(--accent-hover);
-}
-
-.btn-secondary {
-    background-color: transparent;
-    color: var(--text-main);
-    border: 2px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-    background-color: var(--border-color);
-}
-
-.controls-section {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-bottom: 25px;
-}
-
-/* Elementos do Jogo Canvas */
-.score-board {
-    display: flex;
-    justify-content: space-around;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    background-color: var(--bg-primary);
-    padding: 10px;
-    border-radius: 6px;
-}
-
-.canvas-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-canvas {
-    background-color: #2c3e50;
-    border: 4px solid var(--accent-color);
-    border-radius: 8px;
-    max-width: 100%;
-    height: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Legendas Didáticas */
-.game-legend ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-}
-
-.game-legend li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-
-.dot {
-    width: 15px;
-    height: 15px;
-    border-radius: 3px;
-    display: inline-block;
-}
-
-.dot.positive { background-color: var(--accent-color); }
-.dot.negative { background-color: var(--danger-color); }
-
-/* Rodapé */
-footer {
-    text-align: center;
-    padding: 20px;
-    margin-top: 40px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    border-top: 1px solid var(--border-color);
-}
-
-/* Classes de Utilidade */
-.hidden { display: none !important; }
-
-#welcome-message {
-    font-weight: bold;
-    color: var(--accent-color);
-    text-align: center;
-    margin-top: 10px;
-}
-
-/* 📱 Media Queries (Responsividade Obrigatória para Nível 4) */
-@media (max-width: 600px) {
-    body { padding: 10px; }
-    header h1 { font-size: 1.6rem; }
-    .controls-section { flex-direction: column; }
-    button { width: 100%; }
-}
+// Captura de eventos de teclas direcionais evitando comportamento padrão de scroll
+window.addEventListener('keydown', (e) => {
+    switch (e.key) {
+        case 'ArrowUp':
+            if (dy === 0) { dx = 0; dy = -gridSize; e.preventDefault(); }
+            break;
+        case 'ArrowDown':
+            if (dy === 0) { dx = 0; dy = gridSize; e.preventDefault(); }
+            break;
+        case 'ArrowLeft':
+            if (dx === 0) { dx = -gridSize; dy = 0; e.preventDefault(); }
+            break;
+        case 'ArrowRight':
+            if (dx === 0) { dx = gridSize; dy = 0; e.preventDefault(); }
+            break;
+    }
+});
