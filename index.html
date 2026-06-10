@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Forte, Futuro Sustentável - Agrinho 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Cabeçalho Principal (Tags Estruturais Semânticas) -->
+    <header>
+        <div class="header-container">
+            <h1>Agro Forte, Futuro Sustentável</h1>
+            <p>O equilíbrio perfeito entre a produção de alimentos e a preservação do meio ambiente.</p>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Seção do Formulário de Identificação do Usuário -->
+        <section id="user-section" class="card">
+            <h2>Bem-vindo ao Desafio Sustentável</h2>
+            <p>Insira seu nome para iniciar a simulação da colheita ecológica.</p>
+            <div class="form-group">
+                <label for="username">Nome do Produtor:</label>
+                <input type="text" id="username" placeholder="Ex: João Silva" aria-label="Nome do Produtor">
+                <button id="btn-start">Iniciar Jornada</button>
+            </div>
+            <p id="welcome-message" class="hidden"></p>
+        </section>
+
+        <!-- Seção de Controles de Acessibilidade e Preferências -->
+        <section class="controls-section">
+            <button id="btn-theme" class="btn-secondary">Alternar Modo Escuro</button>
+            <button id="btn-font" class="btn-secondary">Aumentar Fonte</button>
+        </section>
+
+        <!-- Seção do Jogo Interativo (Eco-Snake) -->
+        <section id="game-section" class="card hidden">
+            <h2>Simulador: Colheita Ecológica</h2>
+            <p>Use as <strong>setas do teclado</strong> para guiar a colheitadeira. Colete itens sustentáveis e evite ações poluentes!</p>
+            
+            <!-- Painel de Pontuação com Manipulação do DOM -->
+            <div class="score-board">
+                <div>Pontuação: <span id="score-val">0</span></div>
+                <div>Recorde: <span id="high-score-val">0</span></div>
+            </div>
+
+            <!-- Tabuleiro do Jogo Canvas -->
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+            </div>
+
+            <!-- Legenda Didática do Jogo -->
+            <div class="game-legend">
+                <h3>Legenda de Recursos:</h3>
+                <ul>
+                    <li><span class="dot positive"></span> <strong>Semente Certificada (+10 pts):</strong> Produção eficiente.</li>
+                    <li><span class="dot negative"></span> <strong>Área de Degradação (Game Over):</strong> Evite o esgotamento do solo!</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Seção Educativa sobre a Temática Agrinho -->
+        <section id="about-section" class="card">
+            <h2>O Equilíbrio na Prática</h2>
+            <p>O agro forte do futuro depende diretamente de tecnologias limpas, do manejo correto do solo e do respeito à biodiversidade. Produzir em harmonia com a natureza garante a segurança alimentar das próximas gerações.</p>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; 2026 Concurso Agrinho. Desenvolvido por um Estudante do Ensino Médio.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
